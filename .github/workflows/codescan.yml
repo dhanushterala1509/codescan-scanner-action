@@ -1,0 +1,61 @@
+name: CI
+on:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - src/test/java/**
+      - target/**
+  pull_request:
+    branches: 
+      - '*'
+    paths-ignore:
+      - src/test/java/**
+      - target/**
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Cache files
+        uses: actions/cache@v4
+        with:
+            path: |
+                ~/.sonar
+            key: ${{ runner.os }}-sonar
+            restore-keys: ${{ runner.os }}-sonar
+      - name: Run Codescan On Push
+        if: github.event_name == 'push'
+        uses: codescan-io/codescan-scanner-action@test-node
+        with: 
+          scanChangedFilesOnly: true
+          organization: dhanush
+          projectKey: dhanushterala1509-classandobjects
+          codeScanUrl: https://vadev.codescan.io
+          login: squ_943a2a134a96d58ba2e2c07b52c713fd24d0c58d
+          generateSarifFile: true
+      - name: Run Codescan On PR
+        if: github.event_name == 'pull_request'
+        uses: codescan-io/codescan-scanner-action@1.6
+        with: 
+          scanChangedFilesOnly: true
+          organization: va-testing
+          projectKey: hub-scanner_actions
+          codeScanUrl: https://appgov.codescan.io
+          login: squ_052ff374794698272cc6a4712bb63a86b0fc25ea
+          generateSarifFile: true
+          args: |
+            sonar.pullrequest.branch=${{github.head_ref}}
+            sonar.pullrequest.base=${{github.base_ref}}
+            sonar.pullrequest.key=${{github.event.number}}
+      
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: codescan.sarif
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: codescan.sarif
+          path: codescan.sarif 

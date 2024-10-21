@@ -49214,7 +49214,7 @@ module.exports._Y = getLocalSonarScannerExecutable
 __webpack_unused_export__ = getInstallFolderPath
 
 const SONAR_SCANNER_MIRROR = 'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/'
-const SONAR_SCANNER_VERSION = '4.7.0.2747'
+const SONAR_SCANNER_VERSION = '6.2.1.4610'
 
 const bar = new ProgressBar('[:bar] :percent :etas', {
   complete: '=',
